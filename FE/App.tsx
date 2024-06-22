@@ -1,10 +1,27 @@
 import { View, Text, StyleSheet } from "react-native";
+import "react-native-gesture-handler";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import HomeScreen from "./screens/HomeScreen";
+import AddCardScreen from "./screens/AddCardScreen";
+const Stack = createStackNavigator();
 
 export default function App() {
   return (
-    <View>
-      <Text>Open up App.tsx to start working on your app!</Text>
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName='Home'>
+        <Stack.Screen
+          name='Home'
+          component={HomeScreen}
+          options={{ title: "Cards" }}
+        />
+        <Stack.Screen
+          name='AddCard'
+          component={AddCardScreen}
+          options={{ title: "Add Card" }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
