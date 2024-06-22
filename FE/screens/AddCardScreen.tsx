@@ -13,29 +13,41 @@ import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Omise from "omise-react-native";
 import { Input, Icon } from "react-native-elements";
+import RoundedInput from "../components/RoundedInput";
 Omise.config("your_omise_public_key"); // Replace with your Omise public key
 
 const AddCardScreen = () => {
   const [cardNumber, setCardNumber] = useState("");
-  const [expiryMonth, setExpiryMonth] = useState("");
-  const [expiryYear, setExpiryYear] = useState("");
+  const [cardName, setCardName] = useState("");
+  const [expiry, setExpiry] = useState("");
   const [cvc, setCvc] = useState("");
   const navigation = useNavigation();
 
+  const formatCardNumber = (input) => {
+    // Remove all non-digits
+    const digitsOnly = input.replace(/\D/g, "");
+    // Insert space every 4 characters
+    return digitsOnly.replace(/(\d{4})/g, "$1 ").trim();
+  };
+
+  const formatExpiry = (input) => {
+    // Remove all non-digits
+    const digitsOnly = input.replace(/\D/g, "");
+    // Add '/' after 2 digits (month)
+    if (digitsOnly.length > 2) {
+      return `${digitsOnly.slice(0, 2)}/${digitsOnly.slice(2)}`;
+    }
+    return digitsOnly;
+  };
   const handleAddCard = async () => {
-    if (
-      cardNumber.length === 16 &&
-      expiryMonth.length === 2 &&
-      expiryYear.length === 4 &&
-      cvc.length === 3
-    ) {
+    if (cardNumber.length === 16 && cvc.length === 3) {
       try {
         const token = await Omise.createToken({
           card: {
             name: "John Doe", // Replace with the cardholder's name
             number: cardNumber,
-            expiration_month: expiryMonth,
-            expiration_year: expiryYear,
+            expiration_month: expiry.split("/")[0],
+            expiration_year: expiry.split("/")[1],
             security_code: cvc,
           },
         });
@@ -67,24 +79,44 @@ const AddCardScreen = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.content}>
-        <Input
-          placeholder='Card Number'
-          leftIcon={<Icon name='credit-card' type='font-awesome' />}
-          onChangeText={setCardNumber}
+        <Text style={styles.label}>ATM/Debit/Credit card number</Text>
+        <RoundedInput
+          placeholder='0000 0000 0000 0000'
+          onChangeText={(text) => setCardNumber(formatCardNumber(text))}
           value={cardNumber}
+          keyboardType='numeric'
+          maxLength={19}
         />
-        <Input
-          placeholder='MM/YY'
-          leftIcon={<Icon name='calendar' type='font-awesome' />}
-          onChangeText={setExpiry}
-          value={expiry}
+        <Text style={styles.label}>Name on Card</Text>
+        <RoundedInput
+          placeholder='Ty Lee'
+          onChangeText={setCardName}
+          value={cardName}
+          maxLength={19}
         />
-        <Input
-          placeholder='CVV'
-          leftIcon={<Icon name='lock' type='font-awesome' />}
-          onChangeText={setCvc}
-          value={cvc}
-        />
+
+        <View style={styles.innerInput}>
+          <View>
+            <Text style={styles.label}>Expiry Date</Text>
+            <RoundedInput
+              placeholder='MM/YY'
+              onChangeText={(text) => setExpiry(formatExpiry(text))}
+              value={expiry}
+              keyboardType='numeric'
+              maxLength={5}
+            />
+          </View>
+          <View>
+            <Text style={styles.label}>CVV</Text>
+            <RoundedInput
+              placeholder='CVV'
+              onChangeText={setCvc}
+              value={cvc}
+              keyboardType='numeric'
+              maxLength={3}
+            />
+          </View>
+        </View>
         <Button title='Add Card' onPress={handleAddCard} />
       </View>
     </SafeAreaView>
@@ -96,10 +128,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
+  innerInput: {
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "space-between",
+  },
   content: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     padding: 20,
   },
   header: {
@@ -113,13 +148,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 8,
   },
-  input: {
-    borderWidth: 1,
+  inputContainer: {
+    borderBottomWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 4,
-    padding: 8,
-    fontSize: 18,
-    marginBottom: 16,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    marginBottom: 20,
+  },
+  input: {
+    fontSize: 16,
+    paddingVertical: 10,
   },
 });
 
