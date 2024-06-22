@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   StyleSheet,
   TouchableOpacity,
   Image,
@@ -12,9 +11,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Omise from "omise-react-native";
-import { Input, Icon } from "react-native-elements";
-import RoundedInput from "../components/RoundedInput";
-Omise.config("your_omise_public_key"); // Replace with your Omise public key
+Omise.config("pkey_test_5wvisbxphp1zapg8ie6"); // Replace with your Omise public key
 
 const AddCardScreen = () => {
   const [cardNumber, setCardNumber] = useState("");
@@ -24,6 +21,7 @@ const AddCardScreen = () => {
   const navigation = useNavigation();
 
   const formatCardNumber = (input) => {
+    if (cardNumber.length > 19) return;
     // Remove all non-digits
     const digitsOnly = input.replace(/\D/g, "");
     // Insert space every 4 characters
@@ -40,28 +38,46 @@ const AddCardScreen = () => {
     return digitsOnly;
   };
   const handleAddCard = async () => {
-    if (cardNumber.length === 16 && cvc.length === 3) {
+    console.log("cardNumber", {
+      name: cardName, // Replace with the cardholder's name
+      number: cardNumber.replace(/\s/g, ""),
+      expiration_month: expiry.split("/")[0],
+      expiration_year: "20" + expiry.split("/")[1],
+      security_code: cvc,
+    });
+    if (cardNumber.replace(/\s/g, "").length === 16) {
       try {
         const token = await Omise.createToken({
           card: {
-            name: "John Doe", // Replace with the cardholder's name
-            number: cardNumber,
-            expiration_month: expiry.split("/")[0],
-            expiration_year: expiry.split("/")[1],
-            security_code: cvc,
+            name: "John Doe",
+            number: "4242424242424242",
+            expiration_month: "12",
+            expiration_year: "2024",
+            security_code: "123",
           },
         });
 
         if (token.id) {
           const storedCards = await AsyncStorage.getItem("cards");
+          console.log("storedCards", storedCards);
           const cards = storedCards ? JSON.parse(storedCards) : [];
-          cards.push(cardNumber);
+          cards.push({
+            card: {
+              name: cardName, // Replace with the cardholder's name
+              number: cardNumber.replace(/\s/g, ""),
+              expiration_month: expiry.split("/")[0],
+              expiration_year: expiry.split("/")[1],
+              security_code: cvc,
+            },
+            token: token,
+          });
           await AsyncStorage.setItem("cards", JSON.stringify(cards));
           navigation.goBack();
         } else {
           alert("Failed to create token");
         }
       } catch (error) {
+        console.log("error", error);
         alert(`Error: ${error.message}`);
       }
     } else {
@@ -87,7 +103,8 @@ const AddCardScreen = () => {
             keyboardType='numeric'
             value={cardNumber}
             placeholderTextColor={"#CDCDCD"}
-            onChangeText={setCardNumber}
+            onChangeText={(text) => setCardNumber(formatCardNumber(text))}
+            maxLength={19}
           />
           <View style={styles.cardIcons}>
             <Image
@@ -119,8 +136,10 @@ const AddCardScreen = () => {
               style={styles.input}
               placeholder='MM/YY'
               value={expiry}
-              onChangeText={setExpiry}
+              onChangeText={(text) => setExpiry(formatExpiry(text))}
               placeholderTextColor={"#CDCDCD"}
+              keyboardType='numeric'
+              maxLength={5}
             />
           </View>
           <View style={styles.column2}>
@@ -132,6 +151,7 @@ const AddCardScreen = () => {
               value={cvc}
               onChangeText={setCvc}
               placeholderTextColor={"#CDCDCD"}
+              maxLength={3}
             />
           </View>
         </View>
@@ -151,7 +171,7 @@ const AddCardScreen = () => {
         </View>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleAddCard}>
           <Text style={styles.buttonText}>Add Card</Text>
         </TouchableOpacity>
       </View>
@@ -196,9 +216,9 @@ const styles = StyleSheet.create({
     padding: 15,
     paddingRight: 60, // add padding to the right to make space for icons
     fontSize: 16,
-    maxWidth: 350,
     marginBottom: 30,
-    maxHeight: 50,
+    height: 50, // Use height instead of maxHeight
+    width: 350, // Use width instead of maxWidth
   },
   inputWrapper: {
     position: "relative",
@@ -206,7 +226,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
-    maxWidth: 350,
+    width: 350, // Use width instead of maxWidth
   },
   column: {
     flex: 1,
