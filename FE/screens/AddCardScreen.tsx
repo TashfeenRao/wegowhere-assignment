@@ -80,44 +80,80 @@ const AddCardScreen = () => {
       </View>
       <View style={styles.content}>
         <Text style={styles.label}>ATM/Debit/Credit card number</Text>
-        <RoundedInput
-          placeholder='0000 0000 0000 0000'
-          onChangeText={(text) => setCardNumber(formatCardNumber(text))}
-          value={cardNumber}
-          keyboardType='numeric'
-          maxLength={19}
-        />
-        <Text style={styles.label}>Name on Card</Text>
-        <RoundedInput
-          placeholder='Ty Lee'
-          onChangeText={setCardName}
-          value={cardName}
-          maxLength={19}
-        />
-
-        <View style={styles.innerInput}>
-          <View>
-            <Text style={styles.label}>Expiry Date</Text>
-            <RoundedInput
-              placeholder='MM/YY'
-              onChangeText={(text) => setExpiry(formatExpiry(text))}
-              value={expiry}
-              keyboardType='numeric'
-              maxLength={5}
+        <View style={styles.inputWrapper}>
+          <TextInput
+            style={styles.input}
+            placeholder='0000 0000 0000 0000'
+            keyboardType='numeric'
+            value={cardNumber}
+            placeholderTextColor={"#CDCDCD"}
+            onChangeText={setCardNumber}
+          />
+          <View style={styles.cardIcons}>
+            <Image
+              source={require("../assets/visa_color_2.png")}
+              style={styles.cardIcon}
             />
-          </View>
-          <View>
-            <Text style={styles.label}>CVV</Text>
-            <RoundedInput
-              placeholder='CVV'
-              onChangeText={setCvc}
-              value={cvc}
-              keyboardType='numeric'
-              maxLength={3}
+            <Image
+              source={require("../assets/mastercard_color_2.png")}
+              style={styles.cardIcon}
+            />
+            <Image
+              source={require("../assets/jcb_color_2.png")}
+              style={styles.cardIcon}
             />
           </View>
         </View>
-        <Button title='Add Card' onPress={handleAddCard} />
+        <Text style={styles.label}>Name on Card</Text>
+        <TextInput
+          style={styles.input}
+          placeholder='Ty Lee'
+          value={cardName}
+          onChangeText={setCardName}
+          placeholderTextColor={"#CDCDCD"}
+        />
+        <View style={styles.row}>
+          <View style={styles.column}>
+            <Text style={styles.label}>Expiry date</Text>
+            <TextInput
+              style={styles.input}
+              placeholder='MM/YY'
+              value={expiry}
+              onChangeText={setExpiry}
+              placeholderTextColor={"#CDCDCD"}
+            />
+          </View>
+          <View style={styles.column2}>
+            <Text style={styles.label}>CVV</Text>
+            <TextInput
+              style={styles.input}
+              keyboardType='numeric'
+              secureTextEntry
+              value={cvc}
+              onChangeText={setCvc}
+              placeholderTextColor={"#CDCDCD"}
+            />
+          </View>
+        </View>
+        <View style={styles.securityIcons}>
+          <Image
+            source={require("../assets/verified-by-visa.png")}
+            style={styles.securityIcon1}
+          />
+          <Image
+            source={require("../assets/mastercard-securecode-grey.png")}
+            style={styles.securityIcon2}
+          />
+          <Image
+            source={require("../assets/omise-grey.png")}
+            style={styles.securityIcon2}
+          />
+        </View>
+      </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Add Card</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -127,15 +163,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    // justifyContent: "space-between",
   },
-  innerInput: {
-    flexDirection: "row",
-    width: "100%",
-    justifyContent: "space-between",
-  },
-  content: {
-    flex: 1,
-    padding: 20,
+  buttonContainer: {
+    alignItems: "center",
+    marginTop: 20,
   },
   header: {
     flexDirection: "row",
@@ -145,19 +177,84 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   label: {
-    fontSize: 18,
+    fontSize: 15,
+    fontWeight: "500",
+    lineHeight: 21,
     marginBottom: 8,
+    color: "#000000",
   },
-  inputContainer: {
-    borderBottomWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    marginBottom: 20,
+  content: {
+    flex: 1,
+    paddingTop: 20,
+    marginLeft: 25,
+    backgroundColor: "white",
   },
   input: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 5,
+    padding: 15,
+    paddingRight: 60, // add padding to the right to make space for icons
     fontSize: 16,
-    paddingVertical: 10,
+    maxWidth: 350,
+    marginBottom: 30,
+    maxHeight: 50,
+  },
+  inputWrapper: {
+    position: "relative",
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    maxWidth: 350,
+  },
+  column: {
+    flex: 1,
+  },
+  column2: {
+    flex: 1,
+    marginLeft: 5,
+  },
+  button: {
+    backgroundColor: "#4AD8DA",
+    padding: 15,
+    borderRadius: 30,
+    alignItems: "center",
+    marginBottom: 15,
+    width: 331,
+    alignContent: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    lineHeight: 22.4,
+    fontWeight: "700",
+  },
+  cardIcons: {
+    position: "absolute",
+    right: 50,
+    top: 18,
+    flexDirection: "row",
+  },
+  cardIcon: {
+    width: 25,
+    height: 15,
+    marginRight: 10,
+  },
+  securityIcons: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 20,
+  },
+  securityIcon1: {
+    width: 40,
+    height: 20,
+    marginHorizontal: 10,
+  },
+  securityIcon2: {
+    width: 55,
+    height: 20,
+    marginHorizontal: 10,
   },
 });
 
