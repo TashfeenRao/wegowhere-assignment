@@ -95,12 +95,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 17,
+    fontWeight: "700",
+    lineHeight: 23.8,
   },
   content: {
     flex: 1,
@@ -114,18 +113,20 @@ const styles = StyleSheet.create({
   },
   noCardsText: {
     fontSize: 18,
-    fontWeight: "bold",
+    lineHeight: 25.2,
     marginBottom: 8,
   },
   recommendText: {
-    fontSize: 14,
-    color: "#777",
+    fontSize: 18,
+    lineHeight: 25.2,
     marginBottom: 16,
     textAlign: "center",
+    width: "60%",
   },
   addCardText: {
-    fontSize: 16,
-    color: "#00bcd4",
+    fontSize: 18,
+    fontWeight: "500",
+    color: "#4AD8DA",
   },
   card: {
     backgroundColor: "#f9f9f9",
