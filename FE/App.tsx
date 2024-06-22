@@ -13,7 +13,7 @@ export default function App() {
         <Stack.Screen
           name='Home'
           component={HomeScreen}
-          options={{ title: "Cards" }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name='AddCard'

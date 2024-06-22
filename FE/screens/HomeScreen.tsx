@@ -5,9 +5,12 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
+  Image,
 } from "react-native";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const HomeScreen = () => {
   const [cards, setCards] = useState<string[]>([]);
@@ -34,7 +37,35 @@ const HomeScreen = () => {
     );
   };
 
-  return (
+  return true ? (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name='arrow-back' size={24} color='black' />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Cards</Text>
+        <TouchableOpacity onPress={() => navigation.navigate("AddCard")}>
+          <Image
+            source={require("../assets/Icon.png")} // Replace with your image URL or local file
+            style={styles.IconStyle}
+          />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.content}>
+        <Image
+          source={require("../assets/💳.png")} // Replace with your image URL or local file
+          style={styles.cardImage}
+        />
+        <Text style={styles.noCardsText}>No Cards Found</Text>
+        <Text style={styles.recommendText}>
+          We recommend adding a card for easy payment
+        </Text>
+        <TouchableOpacity onPress={() => navigation.navigate("AddCard")}>
+          <Text style={styles.addCardText}>Add New Card</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  ) : (
     <View style={styles.container}>
       <FlatList
         data={cards}
@@ -53,7 +84,48 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#fff",
+  },
+  IconStyle: {
+    width: 23,
+    height: 23,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  content: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  cardImage: {
+    width: 40,
+    height: 40,
+    marginBottom: 16,
+  },
+  noCardsText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  recommendText: {
+    fontSize: 14,
+    color: "#777",
+    marginBottom: 16,
+    textAlign: "center",
+  },
+  addCardText: {
+    fontSize: 16,
+    color: "#00bcd4",
   },
   card: {
     backgroundColor: "#f9f9f9",
