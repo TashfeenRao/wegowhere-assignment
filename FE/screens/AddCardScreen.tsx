@@ -1,9 +1,18 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  SafeAreaView,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Omise from "omise-react-native";
-
+import { Input, Icon } from "react-native-elements";
 Omise.config("your_omise_public_key"); // Replace with your Omise public key
 
 const AddCardScreen = () => {
@@ -49,49 +58,56 @@ const AddCardScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Enter Card Number:</Text>
-      <TextInput
-        style={styles.input}
-        value={cardNumber}
-        onChangeText={setCardNumber}
-        keyboardType='numeric'
-        maxLength={16}
-      />
-      <Text style={styles.label}>Expiry Month:</Text>
-      <TextInput
-        style={styles.input}
-        value={expiryMonth}
-        onChangeText={setExpiryMonth}
-        keyboardType='numeric'
-        maxLength={2}
-      />
-      <Text style={styles.label}>Expiry Year:</Text>
-      <TextInput
-        style={styles.input}
-        value={expiryYear}
-        onChangeText={setExpiryYear}
-        keyboardType='numeric'
-        maxLength={4}
-      />
-      <Text style={styles.label}>CVC:</Text>
-      <TextInput
-        style={styles.input}
-        value={cvc}
-        onChangeText={setCvc}
-        keyboardType='numeric'
-        maxLength={3}
-      />
-      <Button title='Add Card' onPress={handleAddCard} />
-    </View>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Image
+            source={require("../assets/back.png")} // Replace with your image URL or local file
+          />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.content}>
+        <Input
+          placeholder='Card Number'
+          leftIcon={<Icon name='credit-card' type='font-awesome' />}
+          onChangeText={setCardNumber}
+          value={cardNumber}
+        />
+        <Input
+          placeholder='MM/YY'
+          leftIcon={<Icon name='calendar' type='font-awesome' />}
+          onChangeText={setExpiry}
+          value={expiry}
+        />
+        <Input
+          placeholder='CVV'
+          leftIcon={<Icon name='lock' type='font-awesome' />}
+          onChangeText={setCvc}
+          value={cvc}
+        />
+        <Button title='Add Card' onPress={handleAddCard} />
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    backgroundColor: "#fff",
+  },
+  content: {
+    flex: 1,
     justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 16,
+    padding: 16,
   },
   label: {
     fontSize: 18,

@@ -41,7 +41,9 @@ const HomeScreen = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name='arrow-back' size={24} color='black' />
+          <Image
+            source={require("../assets/back.png")} // Replace with your image URL or local file
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Cards</Text>
         <TouchableOpacity onPress={() => navigation.navigate("AddCard")}>
@@ -66,7 +68,7 @@ const HomeScreen = () => {
       </View>
     </SafeAreaView>
   ) : (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <FlatList
         data={cards}
         renderItem={renderCard}
@@ -77,7 +79,7 @@ const HomeScreen = () => {
         onPress={() => navigation.navigate("AddCard")}>
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 
