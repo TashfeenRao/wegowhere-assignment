@@ -12,12 +12,27 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import axios from "axios";
 import Toast from "react-native-toast-message";
+import type { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../types/navigationTypes";
+
+type CardType = {
+  card: {
+    name: string;
+    number: string;
+    expiration_month: string;
+    expiration_year: string;
+    security_code: string;
+  };
+};
+
+type NavigationProp = StackNavigationProp<RootStackParamList, "AddCard">;
+
 const HomeScreen = () => {
-  const [cards, setCards] = useState<string[]>([]);
-  const navigation = useNavigation();
+  const [cards, setCards] = useState<CardType[]>([]);
+  const navigation = useNavigation<NavigationProp>();
   const isFocused = useIsFocused();
 
-  const handleCardPress = async (item) => {
+  const handleCardPress = async (item: CardType) => {
     try {
       const omisePublicKey = "pkey_test_5wvisbxphp1zapg8ie6";
       const omiseSecretKey = "skey_test_5wvisdjjoqmfof5npzw";
@@ -105,7 +120,7 @@ const HomeScreen = () => {
     fetchCards();
   }, [isFocused]);
 
-  const renderCard = ({ item }) => {
+  const renderCard = ({ item }: { item: CardType }) => {
     const hiddenCardNumber = `\u2022\u2022\u2022\u2022   \u2022\u2022\u2022\u2022    \u2022\u2022\u2022\u2022    ${item.card.number.slice(
       -4
     )}`;
@@ -139,15 +154,13 @@ const HomeScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Image
-            source={require("../assets/back.png")} // Replace with your image URL or local file
-          />
+        <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+          <Image source={require("../assets/back.png")} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Cards</Text>
         <TouchableOpacity onPress={() => navigation.navigate("AddCard")}>
           <Image
-            source={require("../assets/Icon.png")} // Replace with your image URL or local file
+            source={require("../assets/Icon.png")}
             style={styles.IconStyle}
           />
         </TouchableOpacity>
