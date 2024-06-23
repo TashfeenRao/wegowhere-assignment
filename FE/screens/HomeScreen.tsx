@@ -63,8 +63,6 @@ const HomeScreen = () => {
 
       const tokenId = tokenResponse.data.id;
 
-      console.log("Token created:", tokenId);
-
       const chargeData = {
         amount: 2000,
         currency: "thb",
@@ -94,7 +92,6 @@ const HomeScreen = () => {
         topOffset: 30,
         bottomOffset: 40,
       });
-      console.log("Charge created:", chargeResponse.data);
     } catch (error: any) {
       console.log("Error creating charge:", error.response.data);
       Toast.show({
@@ -169,7 +166,7 @@ const HomeScreen = () => {
       {cards.length === 0 ? (
         <View style={styles.content}>
           <Image
-            source={require("../assets/💳.png")} // Replace with your image URL or local file
+            source={require("../assets/💳.png")}
             style={styles.cardImage}
           />
           <Text style={styles.noCardsText}>No Cards Found</Text>
@@ -236,9 +233,6 @@ const styles = StyleSheet.create({
   cardNumberContainer: {
     flex: 1,
     flexDirection: "column",
-    // justifyContent: "center",
-    // alignItems: "center",
-    // marginBottom: 16,
   },
   addCardText: {
     fontSize: 18,
@@ -295,7 +289,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "500",
     color: "#808080",
-    // lineHeight: 21,
     letterSpacing: 2,
     marginBottom: 16,
     flex: 1,
