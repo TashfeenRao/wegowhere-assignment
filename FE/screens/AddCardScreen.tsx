@@ -10,8 +10,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Omise from "omise-react-native";
-Omise.config("pkey_test_5wvisbxphp1zapg8ie6"); // Replace with your Omise public key
+import Toast from "react-native-toast-message";
 
 const AddCardScreen = () => {
   const [cardNumber, setCardNumber] = useState("");
@@ -20,15 +19,15 @@ const AddCardScreen = () => {
   const [cvc, setCvc] = useState("");
   const navigation = useNavigation();
 
-  const formatCardNumber = (input) => {
-    if (cardNumber.length > 19) return;
+  const formatCardNumber = (input: string) => {
+    if (cardNumber.length >= 19) return cardNumber;
     // Remove all non-digits
     const digitsOnly = input.replace(/\D/g, "");
     // Insert space every 4 characters
     return digitsOnly.replace(/(\d{4})/g, "$1 ").trim();
   };
 
-  const formatExpiry = (input) => {
+  const formatExpiry = (input: string) => {
     // Remove all non-digits
     const digitsOnly = input.replace(/\D/g, "");
     // Add '/' after 2 digits (month)
@@ -47,41 +46,31 @@ const AddCardScreen = () => {
     });
     if (cardNumber.replace(/\s/g, "").length === 16) {
       try {
-        const token = await Omise.createToken({
+        const storedCards = await AsyncStorage.getItem("cards");
+        console.log("storedCards", storedCards);
+        const cards = storedCards ? JSON.parse(storedCards) : [];
+        cards.push({
           card: {
-            name: "John Doe",
-            number: "4242424242424242",
-            expiration_month: "12",
-            expiration_year: "2024",
-            security_code: "123",
+            name: cardName, // Replace with the cardholder's name
+            number: cardNumber.replace(/\s/g, ""),
+            expiration_month: expiry.split("/")[0],
+            expiration_year: expiry.split("/")[1],
+            security_code: cvc,
           },
         });
-
-        if (token.id) {
-          const storedCards = await AsyncStorage.getItem("cards");
-          console.log("storedCards", storedCards);
-          const cards = storedCards ? JSON.parse(storedCards) : [];
-          cards.push({
-            card: {
-              name: cardName, // Replace with the cardholder's name
-              number: cardNumber.replace(/\s/g, ""),
-              expiration_month: expiry.split("/")[0],
-              expiration_year: expiry.split("/")[1],
-              security_code: cvc,
-            },
-            token: token,
-          });
-          await AsyncStorage.setItem("cards", JSON.stringify(cards));
-          navigation.goBack();
-        } else {
-          alert("Failed to create token");
-        }
+        await AsyncStorage.setItem("cards", JSON.stringify(cards));
+        navigation.goBack();
       } catch (error) {
         console.log("error", error);
-        alert(`Error: ${error.message}`);
+        alert(`Sorry Could not create the Card Info`);
       }
     } else {
-      alert("Please fill in all fields correctly");
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Invalid Card Number",
+        position: "bottom",
+      });
     }
   };
 
@@ -133,7 +122,7 @@ const AddCardScreen = () => {
           <View style={styles.column}>
             <Text style={styles.label}>Expiry date</Text>
             <TextInput
-              style={styles.input}
+              style={styles.input2}
               placeholder='MM/YY'
               value={expiry}
               onChangeText={(text) => setExpiry(formatExpiry(text))}
@@ -145,7 +134,7 @@ const AddCardScreen = () => {
           <View style={styles.column2}>
             <Text style={styles.label}>CVV</Text>
             <TextInput
-              style={styles.input}
+              style={styles.input2}
               keyboardType='numeric'
               secureTextEntry
               value={cvc}
@@ -214,11 +203,23 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
     borderRadius: 5,
     padding: 15,
-    paddingRight: 60, // add padding to the right to make space for icons
+    paddingRight: 60,
     fontSize: 16,
     marginBottom: 30,
-    height: 50, // Use height instead of maxHeight
-    width: 350, // Use width instead of maxWidth
+    height: 50,
+    width: 350,
+  },
+
+  input2: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 5,
+    padding: 15,
+    paddingRight: 60,
+    fontSize: 16,
+    marginBottom: 30,
+    height: 50,
+    width: 160,
   },
   inputWrapper: {
     position: "relative",
@@ -226,14 +227,15 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
-    width: 350, // Use width instead of maxWidth
+    width: 350,
   },
   column: {
     flex: 1,
+    width: 150,
   },
   column2: {
     flex: 1,
-    marginLeft: 5,
+    paddingLeft: 40,
   },
   button: {
     backgroundColor: "#4AD8DA",

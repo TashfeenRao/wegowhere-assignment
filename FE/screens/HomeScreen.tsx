@@ -9,14 +9,91 @@ import {
 } from "react-native";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import axios from "axios";
+import Toast from "react-native-toast-message";
 const HomeScreen = () => {
   const [cards, setCards] = useState<string[]>([]);
   const navigation = useNavigation();
   const isFocused = useIsFocused();
 
+  const handleCardPress = async (item) => {
+    try {
+      const omisePublicKey = "pkey_test_5wvisbxphp1zapg8ie6";
+      const omiseSecretKey = "skey_test_5wvisdjjoqmfof5npzw";
+
+      const cardDetails = {
+        card: {
+          name: item.card.name,
+          number: item.card.number,
+          expiration_month: item.card.expiration_month,
+          expiration_year: 20 + item.card.expiration_year,
+          security_code: item.card.security_code,
+        },
+      };
+
+      const tokenResponse = await axios.post(
+        "https://vault.omise.co/tokens",
+        cardDetails,
+        {
+          auth: {
+            username: omisePublicKey,
+            password: "",
+          },
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const tokenId = tokenResponse.data.id;
+
+      console.log("Token created:", tokenId);
+
+      const chargeData = {
+        amount: 2000,
+        currency: "thb",
+        card: tokenId,
+      };
+
+      const chargeResponse = await axios.post(
+        "https://api.omise.co/charges",
+        chargeData,
+        {
+          auth: {
+            username: omiseSecretKey,
+            password: "",
+          },
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      Toast.show({
+        type: "success",
+        position: "top",
+        text1: "Payment Success",
+        text2: "Your payment was successful",
+        visibilityTime: 4000,
+        autoHide: true,
+        topOffset: 30,
+        bottomOffset: 40,
+      });
+      console.log("Charge created:", chargeResponse.data);
+    } catch (error: any) {
+      console.log("Error creating charge:", error.response.data);
+      Toast.show({
+        type: "error",
+        position: "top",
+        text1: "Payment Failed",
+        text2: error.response.data.code,
+        visibilityTime: 4000,
+        autoHide: true,
+        topOffset: 30,
+        bottomOffset: 40,
+      });
+    }
+  };
   useEffect(() => {
     const fetchCards = async () => {
       const storedCards = await AsyncStorage.getItem("cards");
@@ -28,16 +105,38 @@ const HomeScreen = () => {
     fetchCards();
   }, [isFocused]);
 
-  const renderCard = ({ item }: { item: string }) => {
-    const hiddenCardNumber = `**** **** **** ${item.slice(-4)}`;
+  const renderCard = ({ item }) => {
+    const hiddenCardNumber = `\u2022\u2022\u2022\u2022   \u2022\u2022\u2022\u2022    \u2022\u2022\u2022\u2022    ${item.card.number.slice(
+      -4
+    )}`;
     return (
-      <View style={styles.card}>
-        <Text style={styles.cardText}>{hiddenCardNumber}</Text>
-      </View>
+      <TouchableOpacity onPress={() => handleCardPress(item)}>
+        <View style={styles.cardBox}>
+          <Image
+            source={require("../assets/Visa.png")} // Replace with your Visa logo image URL or local file
+            style={styles.cardLogo}
+          />
+          <View style={styles.cardNumberContainer}>
+            <Text style={styles.cardNumber}>{hiddenCardNumber}</Text>
+          </View>
+          <View style={styles.cardDetails}>
+            <View>
+              <Text style={styles.cardLabel}>Name on Card</Text>
+              <Text style={styles.cardExpiry}>{item.card.name}</Text>
+            </View>
+            <View>
+              <Text style={styles.cardLabel}>Expires</Text>
+              <Text style={styles.cardExpiry}>
+                {item.card.expiration_month}/{item.card.expiration_year}
+              </Text>
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
     );
   };
 
-  return true ? (
+  return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -53,32 +152,28 @@ const HomeScreen = () => {
           />
         </TouchableOpacity>
       </View>
-      <View style={styles.content}>
-        <Image
-          source={require("../assets/💳.png")} // Replace with your image URL or local file
-          style={styles.cardImage}
+
+      {cards.length === 0 ? (
+        <View style={styles.content}>
+          <Image
+            source={require("../assets/💳.png")} // Replace with your image URL or local file
+            style={styles.cardImage}
+          />
+          <Text style={styles.noCardsText}>No Cards Found</Text>
+          <Text style={styles.recommendText}>
+            We recommend adding a card for easy payment
+          </Text>
+          <TouchableOpacity onPress={() => navigation.navigate("AddCard")}>
+            <Text style={styles.addCardText}>Add New Card</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <FlatList
+          data={cards}
+          renderItem={renderCard}
+          keyExtractor={(item, index) => index.toString()}
         />
-        <Text style={styles.noCardsText}>No Cards Found</Text>
-        <Text style={styles.recommendText}>
-          We recommend adding a card for easy payment
-        </Text>
-        <TouchableOpacity onPress={() => navigation.navigate("AddCard")}>
-          <Text style={styles.addCardText}>Add New Card</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
-  ) : (
-    <SafeAreaView style={styles.container}>
-      <FlatList
-        data={cards}
-        renderItem={renderCard}
-        keyExtractor={(item, index) => index.toString()}
-      />
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => navigation.navigate("AddCard")}>
-        <Text style={styles.addButtonText}>+</Text>
-      </TouchableOpacity>
+      )}
     </SafeAreaView>
   );
 };
@@ -125,6 +220,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     width: "60%",
   },
+  cardNumberContainer: {
+    flex: 1,
+    flexDirection: "column",
+    // justifyContent: "center",
+    // alignItems: "center",
+    // marginBottom: 16,
+  },
   addCardText: {
     fontSize: 18,
     fontWeight: "500",
@@ -157,6 +259,55 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 24,
     fontWeight: "bold",
+  },
+  cardBox: {
+    backgroundColor: "#ffffff",
+    padding: 30,
+    marginVertical: 8,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
+    elevation: 3,
+    marginHorizontal: 16,
+  },
+  cardLogo: {
+    width: 50,
+    height: 20,
+    resizeMode: "contain",
+    marginBottom: 16,
+  },
+  cardNumber: {
+    fontSize: 20,
+    fontWeight: "500",
+    color: "#808080",
+    // lineHeight: 21,
+    letterSpacing: 2,
+    marginBottom: 16,
+    flex: 1,
+  },
+  cardDetails: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "80%",
+  },
+  cardName: {
+    fontSize: 16,
+    color: "#999",
+  },
+  cardLabel: {
+    fontSize: 10,
+    fontWeight: "500",
+    lineHeight: 14,
+    color: "#8F8F8F",
+    marginBottom: 12,
+  },
+  cardExpiry: {
+    fontSize: 13,
+    fontWeight: "500",
+    lineHeight: 18,
+    color: "#000",
   },
 });
 

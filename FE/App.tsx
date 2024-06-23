@@ -5,6 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "./screens/HomeScreen";
 import AddCardScreen from "./screens/AddCardScreen";
 const Stack = createStackNavigator();
+import Toast from "react-native-toast-message";
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
+      <Toast />
     </NavigationContainer>
   );
 }
