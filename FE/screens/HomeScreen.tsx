@@ -14,6 +14,7 @@ import axios from "axios";
 import Toast from "react-native-toast-message";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types/navigationTypes";
+import { useCard } from "../customHooks/useCard";
 
 type CardType = {
   card: {
@@ -28,7 +29,8 @@ type CardType = {
 type NavigationProp = StackNavigationProp<RootStackParamList, "AddCard">;
 
 const HomeScreen = () => {
-  const [cards, setCards] = useState<CardType[]>([]);
+  // const [cards, setCards] = useState<CardType[]>([]);
+  const { cards } = useCard();
   const navigation = useNavigation<NavigationProp>();
   const isFocused = useIsFocused();
 
@@ -106,16 +108,16 @@ const HomeScreen = () => {
       });
     }
   };
-  useEffect(() => {
-    const fetchCards = async () => {
-      const storedCards = await AsyncStorage.getItem("cards");
-      if (storedCards) {
-        setCards(JSON.parse(storedCards));
-      }
-    };
+  // useEffect(() => {
+  //   const fetchCards = async () => {
+  //     const storedCards = await AsyncStorage.getItem("cards");
+  //     if (storedCards) {
+  //       setCards(JSON.parse(storedCards));
+  //     }
+  //   };
 
-    fetchCards();
-  }, [isFocused]);
+  //   fetchCards();
+  // }, [isFocused]);
 
   const renderCard = ({ item }: { item: CardType }) => {
     const hiddenCardNumber = `\u2022\u2022\u2022\u2022   \u2022\u2022\u2022\u2022    \u2022\u2022\u2022\u2022    ${item.card.number.slice(

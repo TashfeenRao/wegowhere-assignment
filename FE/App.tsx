@@ -5,23 +5,26 @@ import HomeScreen from "./screens/HomeScreen";
 import AddCardScreen from "./screens/AddCardScreen";
 const Stack = createStackNavigator();
 import Toast from "react-native-toast-message";
+import { CardProvider } from "./context/CardContext";
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName='Home'>
-        <Stack.Screen
-          name='Home'
-          component={HomeScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name='AddCard'
-          component={AddCardScreen}
-          options={{ headerShown: false }}
-        />
-      </Stack.Navigator>
-      <Toast />
-    </NavigationContainer>
+    <CardProvider>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName='Home'>
+          <Stack.Screen
+            name='Home'
+            component={HomeScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name='AddCard'
+            component={AddCardScreen}
+            options={{ headerShown: false }}
+          />
+        </Stack.Navigator>
+        <Toast />
+      </NavigationContainer>
+    </CardProvider>
   );
 }

@@ -9,8 +9,8 @@ import {
   SafeAreaView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
+import { useCard } from "../customHooks/useCard";
 
 const AddCardScreen = () => {
   const [cardNumber, setCardNumber] = useState("");
@@ -18,6 +18,7 @@ const AddCardScreen = () => {
   const [expiry, setExpiry] = useState("");
   const [cvc, setCvc] = useState("");
   const navigation = useNavigation();
+  const { addCard } = useCard();
 
   const formatCardNumber = (input: string) => {
     if (cardNumber.length >= 19) return cardNumber;
@@ -37,19 +38,9 @@ const AddCardScreen = () => {
     return digitsOnly;
   };
   const handleAddCard = async () => {
-    console.log("cardNumber", {
-      name: cardName, // Replace with the cardholder's name
-      number: cardNumber.replace(/\s/g, ""),
-      expiration_month: expiry.split("/")[0],
-      expiration_year: "20" + expiry.split("/")[1],
-      security_code: cvc,
-    });
     if (cardNumber.replace(/\s/g, "").length === 16) {
       try {
-        const storedCards = await AsyncStorage.getItem("cards");
-        console.log("storedCards", storedCards);
-        const cards = storedCards ? JSON.parse(storedCards) : [];
-        cards.push({
+        addCard({
           card: {
             name: cardName, // Replace with the cardholder's name
             number: cardNumber.replace(/\s/g, ""),
@@ -58,7 +49,6 @@ const AddCardScreen = () => {
             security_code: cvc,
           },
         });
-        await AsyncStorage.setItem("cards", JSON.stringify(cards));
         navigation.goBack();
       } catch (error) {
         console.log("error", error);
