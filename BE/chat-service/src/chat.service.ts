@@ -1,6 +1,6 @@
 // src/chat/chat.service.ts
 import { Injectable, Inject } from "@nestjs/common";
-import { ClientProxy } from "@nestjs/microservices";
+import { ClientProxy, EventPattern } from "@nestjs/microservices";
 
 export interface Message {
   senderId: string;
@@ -24,12 +24,17 @@ export class ChatService {
   async processMessage(message: Omit<Message, "timestamp">) {
     const newMessage = { ...message, timestamp: new Date() };
     this.messages.push(newMessage);
-    this.client.emit("message_queue", newMessage);
+    this.client.emit("messages_queue", newMessage);
   }
 
   getMessagesForUser(userId: string): Message[] {
     return this.messages.filter(
       (message) => message.senderId === userId || message.recipientId === userId
     );
+  }
+
+  @EventPattern("messages_queue")
+  async handleMessage(data: Message) {
+    this.messages.push(data);
   }
 }

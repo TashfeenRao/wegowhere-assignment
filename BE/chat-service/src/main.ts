@@ -8,7 +8,7 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
-      urls: ["amqp://localhost:5672"],
+      urls: [process.env.RABBITMQ_URL || "amqp://rabbitmq:5672"],
       queue: "messages_queue",
       queueOptions: {
         durable: false,
@@ -17,6 +17,7 @@ async function bootstrap() {
   });
 
   await app.startAllMicroservices();
-  await app.listen(3001);
+  await app.listen(3000);
+  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();

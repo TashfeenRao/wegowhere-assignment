@@ -1,13 +1,26 @@
-version: "3.7"
+version: "3"
 services:
   chat-service:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     depends_on:
       - rabbitmq
+    environment:
+      RABBITMQ_URL: amqp://rabbitmq:5672
+    networks:
+      - app-network
+
   rabbitmq:
-    image: "rabbitmq:3-management"
+    image: rabbitmq:3-management
     ports:
       - "5672:5672"
       - "15672:15672"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
