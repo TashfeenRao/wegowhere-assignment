@@ -1,6 +1,6 @@
 // src/main.ts
 import { NestFactory } from "@nestjs/core";
-import { ChatModule } from "./chat.module"; // <--C Ensure the path is correct
+import { ChatModule } from "./chat.module";
 import { Transport, MicroserviceOptions } from "@nestjs/microservices";
 
 async function bootstrap() {

@@ -1,12 +1,12 @@
 provider "docker" {
-  host = "tcp://localhost:2375"  # Docker daemon address
+  host = "tcp://localhost:2375"
 }
 
 resource "docker_image" "nestjs_app" {
-  name         = "chat-service-chat-service:latest"  # Replace with your image name
+  name         = "chat-service-chat-service:latest"
   build {
-    context    = "./"  # Path to your NestJS app
-    dockerfile = "./"  # Path to your Dockerfile
+    context    = "./"  
+    dockerfile = "./"  
   }
 }
 
@@ -20,7 +20,7 @@ resource "docker_container" "nestjs_app_container" {
   }
 
   depends_on = [
-    docker_container.rabbitmq  # Ensure NestJS app starts after RabbitMQ
+    docker_container.rabbitmq 
   ]
 
   restart = "always"

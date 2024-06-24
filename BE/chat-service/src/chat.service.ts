@@ -1,4 +1,3 @@
-// src/chat/chat.service.ts
 import { Injectable, Inject } from "@nestjs/common";
 import { ClientProxy, EventPattern } from "@nestjs/microservices";
 
